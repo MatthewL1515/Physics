@@ -1,7 +1,7 @@
 let colorlist = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
 let movers = []
-let G = 0.1
+let G = 0.5
 let wind 
 
 function setup() {
@@ -11,7 +11,7 @@ function setup() {
       new Mover(random(width),random(height),random(-1,1),random(-1,1),10,random(colorlist))
     )  
   }
-  wind = random(-.2,.2)
+  wind = random(-0.2,0.2)
   ellipseMode(RADIUS)
 }
 
@@ -20,7 +20,11 @@ function draw() {
   for( let mover of movers ) {
     mover.update()
   }
-  
+  for (let i = 0; i < movers.length; i++) {
+    for (let j = i + 1; j < movers.length; j++) {
+      movers[i].checkCollision(movers[j])
+    }
+  }
 }
 
 class Mover { // noun
@@ -89,4 +93,35 @@ class Mover { // noun
     }    
       
   }
+  
+  checkCollision(other) {
+    let xDiff = other.x - this.x
+    let yDiff = other.y - this.y
+    let distance = sqrt(xDiff * xDiff + yDiff * yDiff)
+    let minDist = this.r + other.r
+
+    if (distance < minDist) {
+      // Push circles apart slightly to avoid stacking together
+      let overlap = (minDist - distance) / 2
+      let pushX = (xDiff / distance) * overlap
+      let pushY = (yDiff / distance) * overlap
+
+      this.x -= pushX
+      this.y -= pushY
+      other.x += pushX
+      other.y += pushY
+
+      // Decide which axis the collision happened on
+      if (abs(xDiff) > abs(yDiff)) {
+        // x axis collision, bounce horizontally
+        this.dx *= -1
+        other.dx *= -1
+      } else {
+        // y axis collision, bounce vertically
+        this.dy *= -1
+        other.dy *= -1
+      }
+    }
+  }
+
 }
