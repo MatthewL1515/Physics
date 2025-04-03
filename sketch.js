@@ -3,6 +3,7 @@ let colorlist = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4
 let movers = []
 let G = 0.1
 let wind 
+let blackHole = 0
 
 function setup() {
   createCanvas(400, 400);
@@ -18,6 +19,7 @@ function setup() {
 function draw() {
   background(220);
   for( let mover of movers ) {
+    // mover.mouseClicked()
     mover.update()
   }
   for (let i = 0; i < movers.length; i++) {
@@ -25,6 +27,9 @@ function draw() {
       movers[i].checkCollision(movers[j])
     }
   }
+  
+  
+  
   
   drawLegend()
 }
@@ -85,19 +90,19 @@ class Mover { // noun
   containWithinWindow() {
     if( this.x < this.r ) { // moved off the left hand side
       this.x = this.r
-      this.dx *= -1
+      this.dx *= -0.9
     }
     if( this.x > width - this.r ) { // right
       this.x = width-this.r
-      this.dx *= -1
+      this.dx *= -0.9
     }
     if( this.y < this.r ) { // top
       this.y = this.r
-      this.dy *= -1
+      this.dy *= -0.9
     }
     if( this.y > height - this.r ) { // bottom
       this.y = height-this.r
-      this.dy *= -1
+      this.dy *= -0.9
     }    
       
   }
@@ -122,14 +127,26 @@ class Mover { // noun
       // Decide which axis the collision happened on
       if (abs(xDiff) > abs(yDiff)) {
         // x axis collision, bounce horizontally
-        this.dx *= -1
-        other.dx *= -1
+        this.dx *= -0.9
+        other.dx *= -0.9
       } else {
         // y axis collision, bounce vertically
-        this.dy *= -1
-        other.dy *= -1
+        this.dy *= -0.9
+        other.dy *= -0.9
       }
     }
   }
+  
+  blackHole() {
+    
+  }
 
+}
+
+function createBlackHole() {
+  
+}
+
+function mouseClicked() {
+  
 }
