@@ -3,7 +3,7 @@ let colorlist = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4
 let movers = []
 let G = 0.1
 let wind 
-let blackHole = 0
+let blackHoles = []
 
 function setup() {
   createCanvas(400, 400);
@@ -27,9 +27,8 @@ function draw() {
       movers[i].checkCollision(movers[j])
     }
   }
-  
-  
-  
+
+  createBlackHole()
   
   drawLegend()
 }
@@ -137,16 +136,38 @@ class Mover { // noun
     }
   }
   
-  blackHole() {
+  attractTo(hole) {
+    let dx = hole.x - this.x
+    let dy = hole.y - this.y
+    let distanceSq = dx * dx + dy * dy
+    let distance = sqrt(distanceSq)
+    let limitDistance = max(distance, 10) // if the distance ever becomes 0, the ball might just disappear
+    let force = hole.strength / (limitDistance * limitDistance) // inverse square law, so farther = less force
+    
+    this.dx += (dx / limitDistance) * force
+    this.dy += (dy / limitDistance) * force
+    
     
   }
 
 }
 
 function createBlackHole() {
-  
+  for (let hole of blackHoles) {
+    for (let mover of movers) {
+      mover.attractTo(hole)
+    }
+    
+    fill(0)
+    noStroke()
+    circle(hole.x, hole.y, 15)
+  }
 }
 
 function mouseClicked() {
-  
+  blackHoles.push({
+    x: mouseX,
+    y: mouseY,
+    strength: random(100,1000)
+  })
 }
