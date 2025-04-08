@@ -171,3 +171,9 @@ function mouseClicked() {
     strength: random(100,1000)
   })
 }
+
+function keyPressed() {
+  if (key === ' ') {
+    wind += 2 * -wind
+  }
+}
