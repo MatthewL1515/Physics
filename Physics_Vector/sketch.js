@@ -1,96 +1,67 @@
-class Mover { // noun
-  // properties - adjectives
-  //   radius
-  //   velocity (dx,dy)
-  //   position (x,y)
-  //   color
-  // behaviors - verb
-  //   move
-  //   draw
-  //   collide/bounce
-  
-  // initialize all the properties
-  constructor(x,y,dx,dy,r,c) {
-    this.position = createVector(x,y)
-    this.velocity = createVector(dx,dy)
-    this.acceleration = createVector(0,0)
-    this.r = r
-    this.c = c
-  }
-  
-  update() {
-    this.applyForce(createVector(wind,G))
-    this.velocity.add(this.acceleration)
-    this.move()
-    this.containWithinWindow()
-    this.draw()     
-    this.acceleration.mult(0)
-  }
-  
-  draw() {
-    fill(this.c)
-    circle(this.position.x,this.position.y,this.r)
-  }
-  
-  move() {
-    this.position.add(this.velocity)
-  }
-  
-  applyForce(f) {
-    this.acceleration.add(f)
-  }
-  
-  containWithinWindow() {
-    if( this.position.x < this.r ) { // moved off the left hand side
-      this.position.x = this.r
-      this.velocity.x *= -0.9
-    }
-    if( this.position.x > width - this.r ) { // right
-      this.position.x = width-this.r
-      this.velocity.x *= -0.9
-    }
-    if( this.position.y < this.r ) { // top
-      this.position.y = this.r
-      this.velocity.y *= -0.9
-    }
-    if( this.position.y > height - this.r ) { // bottom
-      this.position.y = height-this.r
-      this.velocity.y *= -0.9
-    }    
-      
-  }
-  
-  checkCollision(other) {
-    let diff = p5.Vector.sub(other.position, this.position)
-    let distance = diff.mag()
-    let minDist = this.r + other.r
+let colorlist = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000']
 
-    if (distance < minDist) {
-      // Push circles apart slightly to avoid stacking together
-      let overlap = (minDist - distance) / 2
-      let correction = diff.copy().setMag(overlap)
-      this.position.sub(correction)
-      other.position.add(correction)
+let movers = []
+let G = 0.1
+let wind 
+let blackHoles = []
 
-      // Decide which axis the collision happened on
-      if (abs(diff.x) > abs(diff.y)) {
-        // x axis collision, bounce horizontally
-        this.velocity.x *= -0.9
-        other.velocity.x *= -0.9
-      } else {
-        // y axis collision, bounce vertically
-        this.velocity.y *= -0.9
-        other.velocity.y *= -0.9
-      }
-    }
+function setup() {
+  createCanvas(400, 400);
+  for( let i = 0; i < 10; i++ ) {
+    movers.push( 
+      new Mover(random(width),random(height),random(-1,1),random(-1,1),10,random(colorlist))
+    )  
   }
-  e
-  attractTo(hole) {
-    let force = createVector(hole.x, hole.y).sub(this.position)
-    let distanceSq = constrain(force.magSq(), 100, 10000)
-    let strength = hole.strength / distanceSq
-    force.setMag(strength)
-    this.applyForce(force)
+  wind = random(-0.2,0.2)
+  ellipseMode(RADIUS)
+}
+
+function draw() {
+  background(220);
+  for( let mover of movers ) {
+    // mover.mouseClicked()
+    mover.update()
+  }
+  for (let i = 0; i < movers.length; i++) {
+    for (let j = i + 1; j < movers.length; j++) {
+      movers[i].checkCollision(movers[j])
+    }
   }
 
+  createBlackHole()
+  
+  drawLegend()
+}
+
+function drawLegend() {
+  // Wind Speed
+  fill(0)
+  text(`Wind: ${wind.toFixed(4)}`, 50, 50)
+}
+
+
+function createBlackHole() {
+  for (let hole of blackHoles) {
+    for (let mover of movers) {
+      mover.attractTo(hole)
+    }
+    
+    fill(0)
+    noStroke()
+    circle(hole.x, hole.y, 15)
+  }
+}
+
+function mouseClicked() {  
+  blackHoles.push({
+    x: mouseX,
+    y: mouseY,
+    strength: random(100,1000)
+  })
+}
+
+function keyPressed() {
+  if (key === ' ') {
+    wind += 2 * -wind
+  }
 }
