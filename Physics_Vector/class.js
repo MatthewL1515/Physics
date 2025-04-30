@@ -84,15 +84,6 @@ class Mover { // noun
       }
     }
   }
-
-  attractTo(hole) {
-    let force = createVector(hole.x, hole.y).sub(this.position)
-    let distanceSq = constrain(force.magSq(), 100, 10000)
-    let strength = hole.strength / distanceSq
-    force.setMag(strength)
-    this.applyForce(force)
-  }
-
 }
 
 class Attractor {
