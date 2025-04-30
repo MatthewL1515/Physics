@@ -94,3 +94,24 @@ class Mover { // noun
   }
 
 }
+
+class Attractor {
+  constructor(x, y, strength) {
+    this.position = createVector(x, y)
+    this.strength = strength
+  }
+
+  attract(mover) {
+    let force = p5.Vector.sub(this.position, mover.position)
+    let distanceSq = constrain(force.magSq(), 100, 10000)
+    let strength = this.strength / distanceSq
+    force.setMag(strength)
+    mover.applyForce(force)
+  }
+
+  display() {
+    noStroke()
+    fill(0)
+    circle(this.position.x, this.position.y, 15)
+  }
+}
