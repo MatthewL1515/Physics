@@ -43,21 +43,14 @@ function drawLegend() {
 function createBlackHole() {
   for (let hole of blackHoles) {
     for (let mover of movers) {
-      mover.attractTo(hole)
+      hole.attract(mover)
     }
-    
-    fill(0)
-    noStroke()
-    circle(hole.x, hole.y, 15)
+    hole.display()
   }
 }
 
 function mouseClicked() {  
-  blackHoles.push({
-    x: mouseX,
-    y: mouseY,
-    strength: random(100,1000)
-  })
+  blackHoles.push(new Attractor(mouseX, mouseY, random(100, 1000)))
 }
 
 function keyPressed() {
